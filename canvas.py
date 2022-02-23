@@ -19,6 +19,7 @@ class Canvas(QtWidgets.QLabel):
         self.pen_color = QtGui.QColor(pencolor)
         self.pen_Width = 1
         self.mode = toolMode.pen
+
     def set_pen_color(self, color):
         self.pen_color = QtGui.QColor(color)
 
@@ -39,8 +40,20 @@ class Canvas(QtWidgets.QLabel):
             self.update()
             self.last_x = e.x()
             self.last_y = e.y()
+        elif self.mode == toolMode.eraser:
+            pass  # TODO
+        elif self.mode == toolMode.fill:
+            pass  # TODO
+        else:
+            pass
 
     def mouseReleaseEvent(self, e):
         if self.mode == toolMode.pen:
             self.last_x = None
             self.last_y = None
+        elif self.mode == toolMode.eraser:
+            pass  # TODO
+        elif self.mode == toolMode.fill:
+            pass  # TODO
+        else:
+            pass
