@@ -74,6 +74,7 @@ class Ui(QtWidgets.QMainWindow):
         print("fillBtnPressed")
 
     def penSizeComboboxChange(self):
+        self.canvas.set_pen_size(int(self.penSizeCombobox.currentText()))
         print(self.penSizeCombobox.currentText())
 
     def lineShapeBtnPressed (self):
@@ -91,49 +92,69 @@ class Ui(QtWidgets.QMainWindow):
         color = self.color0Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
     def color1BtnPressed (self):
         color = self.color1Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
     def color2BtnPressed (self):
         color = self.color2Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color3BtnPressed (self):
         color = self.color3Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color4BtnPressed(self):
         color = self.color4Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color5BtnPressed(self):
         color = self.color5Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color6BtnPressed(self):
         color = self.color6Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color7BtnPressed(self):
         color = self.color7Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color8BtnPressed(self):
         color = self.color8Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def color9BtnPressed(self):
         color = self.color9Btn.palette().button().color().name()
         print(str(color))
         self.changeSelectedColorIcon(color)
+        self.canvas.set_pen_color(color)
+
 
     def colorPickerBtnPressed(self):
         print("colorPickerBtnPressed")
