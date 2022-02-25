@@ -73,7 +73,8 @@ class Ui(QtWidgets.QMainWindow):
         print("penBtnPressed")
 
     def eraser_btn_pressed(self):
-        print("eraserBtnPressed")
+        self.canvas.set_mode("eraser")
+        # print("eraserBtnPressed")
 
     def fill_btn_pressed(self):
         print("fillBtnPressed")
