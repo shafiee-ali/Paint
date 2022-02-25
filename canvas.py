@@ -30,6 +30,9 @@ class Canvas(QtWidgets.QLabel):
         self.pen_width = 2
         self.mode = ToolMode.pen
         self.shape_mode = None
+        self.begin_shape_point = None
+        self.end_shape_point = None
+
 
     def set_pen_color(self, color):
         self.pen_color = QtGui.QColor(color)
@@ -58,10 +61,6 @@ class Canvas(QtWidgets.QLabel):
             self.shape_mode = ShapeMode.rounded_rect
 
     def pen_mode_mouse_move_event(self, e):
-        if self.last_x is None:
-            self.last_x = e.x()
-            self.last_y = e.y()
-            return
         painter = QtGui.QPainter(self.pixmap())
         p = painter.pen()
         p.setWidth(self.pen_width)
@@ -74,10 +73,6 @@ class Canvas(QtWidgets.QLabel):
         self.last_y = e.y()
 
     def eraser_mode_mouse_move_event(self, e):
-        if self.last_x is None:
-            self.last_x = e.x()
-            self.last_y = e.y()
-            return
         painter = QtGui.QPainter(self.pixmap())
         p = painter.pen()
         p.setWidth(self.pen_width)
@@ -92,7 +87,9 @@ class Canvas(QtWidgets.QLabel):
 
     def shape_mode_mouse_move_event(self, e):
         if self.shape_mode == ShapeMode.line:
-            pass
+            self.begin_shape_point = e.pos()
+            self.end_shape_point = e.pos()
+
         if self.shape_mode == ShapeMode.circle:
             pass
         if self.shape_mode == ShapeMode.rect:
@@ -100,6 +97,8 @@ class Canvas(QtWidgets.QLabel):
         if self.shape_mode == ShapeMode.rounded_rect:
             pass
 
+    def fill_mode_mouse_move_event(self, e):
+        pass
 
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:
@@ -107,10 +106,54 @@ class Canvas(QtWidgets.QLabel):
         elif self.mode == ToolMode.eraser:
             self.eraser_mode_mouse_move_event(e)
         elif self.mode == ToolMode.fill:
-            pass
+            self.fill_mode_mouse_move_event(e)
         elif self.mode == ToolMode.shape:
-            self.shape_mode_mouse_move_event()
+            self.shape_mode_mouse_move_event(e)
 
+    def pen_mode_mouse_press_event(self, e):
+        self.last_x = e.x()
+        self.last_y = e.y()
+        painter = QtGui.QPainter(self.pixmap())
+        p = painter.pen()
+        p.setWidth(self.pen_width)
+        p.setColor(self.pen_color)
+        painter.setPen(p)
+        painter.drawPoint(e.x(), e.y())
+        painter.end()
+        self.update()
+        self.last_x = e.x()
+        self.last_y = e.y()
+
+    def eraser_mode_mouse_press_event(self, e):
+        self.last_x = e.x()
+        self.last_y = e.y()
+        painter = QtGui.QPainter(self.pixmap())
+        p = painter.pen()
+        p.setWidth(self.pen_width)
+        eraser_color = QtGui.QColor(self.background_color)
+        p.setColor(eraser_color)
+        painter.setPen(p)
+        painter.drawPoint(e.x(), e.y())
+        painter.end()
+        self.update()
+        self.last_x = e.x()
+        self.last_y = e.y()
+
+    def fill_mode_mouse_press_event(self, e):
+        pass
+
+    def shape_mode_mouse_press_event(self, e):
+        pass
+
+    def mousePressEvent(self, e):
+        if self.mode == ToolMode.pen:
+            self.pen_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.eraser:
+            self.eraser_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.fill:
+            self.fill_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.shape:
+            self.shape_mode_mouse_press_event(e)
 
 
 
