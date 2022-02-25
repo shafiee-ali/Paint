@@ -24,6 +24,9 @@ class Canvas(QtWidgets.QLabel):
     def set_pen_color(self, color):
         self.pen_color = QtGui.QColor(color)
 
+    def set_pen_size(self, size):
+        self.pen_width = size
+
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:
             if self.last_x is None:

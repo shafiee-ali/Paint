@@ -4,160 +4,170 @@ import sys
 
 from qt_material import apply_stylesheet  # pip install qt_material
 
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi('UI\\mainwindow.ui', self)
         apply_stylesheet(app, theme='dark_blue.xml')
-
-        self.addtionToUi()
+        self.addition_to_ui()
         self.ConnectBtnsFunctions()
         self.show()
 
-    def addtionToUi(self):
+    def addition_to_ui(self):
         """this function used for ui objects or edits that cant done on QT creator"""
         self.penSizeCombobox.setStyleSheet("font-size: 20px;")
-        self.canvas = Canvas(1100,600)
+        self.canvas = Canvas(1100, 600)
         self.canvasHorizontalLayout.addWidget(self.canvas)
 
     def ConnectBtnsFunctions(self):
         #### btn connections ####
-        self.newFileBtn.pressed.connect(self.newFileBtnPressed)
-        self.openFileBtn.pressed.connect(self.openFileBtnPressed)
-        self.saveFileBtn.pressed.connect(self.saveFileBtnPressed)
-        self.undoBtn.pressed.connect(self.undoBtnPressed)
-        self.redoBtn.pressed.connect(self.redoBtnPressed)
+        self.newFileBtn.pressed.connect(self.new_file_btn_pressed)
+        self.openFileBtn.pressed.connect(self.open_file_btn_pressed)
+        self.saveFileBtn.pressed.connect(self.save_file_btn_pressed)
+        self.undoBtn.pressed.connect(self.undo_btn_pressed)
+        self.redoBtn.pressed.connect(self.redo_btn_pressed)
 
-        self.penBtn.pressed.connect(self.penBtnPressed)
-        self.eraserBtn.pressed.connect(self.eraserBtnPressed)
-        self.fillBtn.pressed.connect(self.fillBtnPressed)
+        self.penBtn.pressed.connect(self.pen_btn_pressed)
+        self.eraserBtn.pressed.connect(self.eraser_btn_pressed)
+        self.fillBtn.pressed.connect(self.fill_btn_pressed)
 
-        self.penSizeCombobox.currentTextChanged.connect(self.penSizeComboboxChange)
+        self.penSizeCombobox.currentTextChanged.connect(self.pen_size_combobox_change)
 
-        self.lineShapeBtn.pressed.connect(self.lineShapeBtnPressed)
-        self.roundedSquareShapeBtn.pressed.connect(self.roundedSquareShapeBtnPressed)
-        self.squareShapeBtn.pressed.connect(self.squareShapeBtnPressed)
-        self.circleShapeBtn.pressed.connect(self.circleShapeBtnPressed)
+        self.lineShapeBtn.pressed.connect(self.line_shape_btn_pressed)
+        self.roundedSquareShapeBtn.pressed.connect(self.rounded_square_shape_btn_pressed)
+        self.squareShapeBtn.pressed.connect(self.square_shape_btn_pressed)
+        self.circleShapeBtn.pressed.connect(self.circle_shape_btn_pressed)
 
+        self.color0Btn.pressed.connect(self.color0_btn_pressed)
+        self.color1Btn.pressed.connect(self.color1_btn_pressed)
+        self.color2Btn.pressed.connect(self.color2_btn_pressed)
+        self.color3Btn.pressed.connect(self.color3_btn_pressed)
+        self.color4Btn.pressed.connect(self.color4_btn_pressed)
+        self.color5Btn.pressed.connect(self.color5_btn_pressed)
+        self.color6Btn.pressed.connect(self.color6_btn_pressed)
+        self.color7Btn.pressed.connect(self.color7_btn_pressed)
+        self.color8Btn.pressed.connect(self.color8_btn_pressed)
+        self.color9Btn.pressed.connect(self.color9_btn_pressed)
 
-        self.color0Btn.pressed.connect(self.color0BtnPressed)
-        self.color1Btn.pressed.connect(self.color1BtnPressed)
-        self.color2Btn.pressed.connect(self.color2BtnPressed)
-        self.color3Btn.pressed.connect(self.color3BtnPressed)
-        self.color4Btn.pressed.connect(self.color4BtnPressed)
-        self.color5Btn.pressed.connect(self.color5BtnPressed)
-        self.color6Btn.pressed.connect(self.color6BtnPressed)
-        self.color7Btn.pressed.connect(self.color7BtnPressed)
-        self.color8Btn.pressed.connect(self.color8BtnPressed)
-        self.color9Btn.pressed.connect(self.color9BtnPressed)
-
-        self.colorPickerBtn.pressed.connect(self.colorPickerBtnPressed)
+        self.colorPickerBtn.pressed.connect(self.color_picker_btn_pressed)
         #### end btn connections ####
 
 
-    def newFileBtnPressed (self):
+    def new_file_btn_pressed(self):
         print("newFileBtnPressed")
-    def openFileBtnPressed (self):
+
+    def open_file_btn_pressed(self):
         print("openFileBtnPressed")
-    def saveFileBtnPressed (self):
+
+    def save_file_btn_pressed (self):
         print("saveFileBtnPressed")
-    def undoBtnPressed (self):
+
+    def undo_btn_pressed(self):
         print("undoBtnPressed")
-    def redoBtnPressed (self):
+
+    def redo_btn_pressed(self):
         print("redoBtnPressed")
 
-    def penBtnPressed(self):
+    def pen_btn_pressed(self):
         print("penBtnPressed")
-    def eraserBtnPressed (self):
+
+    def eraser_btn_pressed(self):
         print("eraserBtnPressed")
-    def fillBtnPressed (self):
+
+    def fill_btn_pressed(self):
         print("fillBtnPressed")
 
-    def penSizeComboboxChange(self):
+    def pen_size_combobox_change(self):
         self.canvas.set_pen_size(int(self.penSizeCombobox.currentText()))
         print(self.penSizeCombobox.currentText())
 
-    def lineShapeBtnPressed (self):
+    def line_shape_btn_pressed(self):
         print("lineShapeBtnPressed")
-    def roundedSquareShapeBtnPressed (self):
+
+    def rounded_square_shape_btn_pressed(self):
         print("roundedSquareShapeBtnPressed")
-    def squareShapeBtnPressed (self):
+
+    def square_shape_btn_pressed(self):
         print("squareShapeBtnPressed")
-    def circleShapeBtnPressed (self):
+
+    def circle_shape_btn_pressed(self):
         print("circleShapeBtnPressed")
 
-    def changeSelectedColorIcon(self,color):
+    def change_selected_color_icon(self, color):
         self.selectedColorIcon.setStyleSheet("background-color:" + color + "; border-radius : 20;")
-    def color0BtnPressed (self):
+
+    def color0_btn_pressed(self):
         color = self.color0Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
-    def color1BtnPressed (self):
+    def color1_btn_pressed(self):
         color = self.color1Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
-    def color2BtnPressed (self):
+    def color2_btn_pressed(self):
         color = self.color2Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color3BtnPressed (self):
+    def color3_btn_pressed(self):
         color = self.color3Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color4BtnPressed(self):
+    def color4_btn_pressed(self):
         color = self.color4Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color5BtnPressed(self):
+    def color5_btn_pressed(self):
         color = self.color5Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color6BtnPressed(self):
+    def color6_btn_pressed(self):
         color = self.color6Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color7BtnPressed(self):
+    def color7_btn_pressed(self):
         color = self.color7Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color8BtnPressed(self):
+    def color8_btn_pressed(self):
         color = self.color8Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def color9BtnPressed(self):
+    def color9_btn_pressed(self):
         color = self.color9Btn.palette().button().color().name()
         print(str(color))
-        self.changeSelectedColorIcon(color)
+        self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
 
-    def colorPickerBtnPressed(self):
+    def color_picker_btn_pressed(self):
         print("colorPickerBtnPressed")
+
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
