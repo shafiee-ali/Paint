@@ -47,6 +47,16 @@ class Canvas(QtWidgets.QLabel):
         if new_mode == "shape":
             self.mode = ToolMode.shape
 
+    def set_shape_mode(self, new_shape_mode):
+        if new_shape_mode == "line":
+            self.shape_mode = ShapeMode.line
+        if new_shape_mode == "circle":
+            self.shape_mode = ShapeMode.circle
+        if new_shape_mode == "rect":
+            self.shape_mode = ShapeMode.rect
+        if new_shape_mode == "rounded_rect":
+            self.shape_mode = ShapeMode.rounded_rect
+
     def pen_mode_mouse_move_event(self, e):
         if self.last_x is None:
             self.last_x = e.x()

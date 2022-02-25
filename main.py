@@ -35,8 +35,8 @@ class Ui(QtWidgets.QMainWindow):
         self.penSizeCombobox.currentTextChanged.connect(self.pen_size_combobox_change)
 
         self.lineShapeBtn.pressed.connect(self.line_shape_btn_pressed)
-        self.roundedSquareShapeBtn.pressed.connect(self.rounded_square_shape_btn_pressed)
-        self.squareShapeBtn.pressed.connect(self.square_shape_btn_pressed)
+        self.roundedSquareShapeBtn.pressed.connect(self.rounded_rect_shape_btn_pressed)
+        self.squareShapeBtn.pressed.connect(self.rect_shape_btn_pressed)
         self.circleShapeBtn.pressed.connect(self.circle_shape_btn_pressed)
 
         self.color0Btn.pressed.connect(self.color0_btn_pressed)
@@ -70,13 +70,15 @@ class Ui(QtWidgets.QMainWindow):
         print("redoBtnPressed")
 
     def pen_btn_pressed(self):
+        self.canvas.set_mode("pen")
         print("penBtnPressed")
 
     def eraser_btn_pressed(self):
         self.canvas.set_mode("eraser")
-        # print("eraserBtnPressed")
+        print("eraserBtnPressed")
 
     def fill_btn_pressed(self):
+        self.canvas.set_mode("fill")
         print("fillBtnPressed")
 
     def pen_size_combobox_change(self):
@@ -84,15 +86,19 @@ class Ui(QtWidgets.QMainWindow):
         print(self.penSizeCombobox.currentText())
 
     def line_shape_btn_pressed(self):
+        self.canvas.set_mode("shape")
         print("lineShapeBtnPressed")
 
-    def rounded_square_shape_btn_pressed(self):
+    def rounded_rect_shape_btn_pressed(self):
+        self.canvas.set_mode("shape")
         print("roundedSquareShapeBtnPressed")
 
-    def square_shape_btn_pressed(self):
+    def rect_shape_btn_pressed(self):
+        self.canvas.set_mode("shape")
         print("squareShapeBtnPressed")
 
     def circle_shape_btn_pressed(self):
+        self.canvas.set_mode("shape")
         print("circleShapeBtnPressed")
 
     def change_selected_color_icon(self, color):
