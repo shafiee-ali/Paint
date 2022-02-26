@@ -87,18 +87,22 @@ class Ui(QtWidgets.QMainWindow):
 
     def line_shape_btn_pressed(self):
         self.canvas.set_mode("shape")
+        self.canvas.set_shape_mode("line")
         print("lineShapeBtnPressed")
 
     def rounded_rect_shape_btn_pressed(self):
         self.canvas.set_mode("shape")
+        self.canvas.set_shape_mode("rounded rect")
         print("roundedSquareShapeBtnPressed")
 
     def rect_shape_btn_pressed(self):
         self.canvas.set_mode("shape")
+        self.canvas.set_shape_mode("rect")
         print("squareShapeBtnPressed")
 
     def circle_shape_btn_pressed(self):
         self.canvas.set_mode("shape")
+        self.canvas.set_shape_mode("circle")
         print("circleShapeBtnPressed")
 
     def change_selected_color_icon(self, color):
