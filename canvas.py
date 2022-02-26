@@ -117,8 +117,16 @@ class Canvas(QtWidgets.QLabel):
         p.setWidth(self.pen_width)
         p.setColor(self.pen_color)
         painter.setPen(p)
-        if self.shape_mode == ShapeMode.rect:
+        if self.shape_mode == ShapeMode.line:
+            painter.drawLine(self.begin_shape_point.x(), self.begin_shape_point.y(), self.end_shape_point.x(), self.end_shape_point.y())
+        elif self.shape_mode == ShapeMode.circle:
+            painter.drawEllipse(self.begin_shape_point.x(), self.begin_shape_point.y(),
+                                self.end_shape_point.x() - self.begin_shape_point.x(),
+                                self.end_shape_point.y() - self.begin_shape_point.y())
+        elif self.shape_mode == ShapeMode.rect:
             painter.drawRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point))
+        elif self.shape_mode == ShapeMode.rounded_rect:
+            painter.drawRoundedRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point), 10, 10)
 
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:
@@ -161,7 +169,6 @@ class Canvas(QtWidgets.QLabel):
 
     def fill_mode_mouse_press_event(self, e):
         pass
-
 
 
 
