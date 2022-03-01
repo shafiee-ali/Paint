@@ -106,6 +106,7 @@ class Canvas(QtWidgets.QLabel):
     def shape_mode_mouse_press_event(self, e):
         self.before_drawing_shape_pixmap = self.pixmap().copy()
         self.begin_shape_point = e.pos()
+        print(type(self.begin_shape_point))
         self.end_shape_point = e.pos()
         self.drawing_shape()
         self.update()
@@ -126,7 +127,13 @@ class Canvas(QtWidgets.QLabel):
         elif self.shape_mode == ShapeMode.rect:
             painter.drawRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point))
         elif self.shape_mode == ShapeMode.rounded_rect:
-            painter.drawRoundedRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point), 10, 10)
+            if self.begin_shape_point.x() < self.end_shape_point.x() and self.begin_shape_point.y() < self.end_shape_point.y():
+                painter.drawRoundedRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point), 10, 10)
+            elif self.begin_shape_point.x() < self.end_shape_point.x() and self.begin_shape_point.y() > self.end_shape_point.y():
+                correct_begin_shape_point = QtCore.QPoint(self.begin_shape_point.x(), self.end_shape_point.y())
+                correct_end_shape_point = QtCore.QPoint(self.end_shape_point.x(), self.begin_shape_point.y())
+                painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
+            elif self.begin_shape_point.x() < self.end_shape_point.x() and self.begin_shape_point.y() > self.end_shape_point.y():
 
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:

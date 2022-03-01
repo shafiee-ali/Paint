@@ -1,17 +1,16 @@
 from canvas import Canvas
 from PyQt5 import QtWidgets, uic  # pip install pyqt5
 import sys
-
 from qt_material import apply_stylesheet  # pip install qt_material
 
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
-        uic.loadUi('UI\\mainwindow.ui', self)
+        uic.loadUi('./UI//mainwindow.ui', self)
         apply_stylesheet(app, theme='dark_blue.xml')
         self.addition_to_ui()
-        self.ConnectBtnsFunctions()
+        self.connect_btns_functions()
         self.show()
 
     def addition_to_ui(self):
@@ -20,7 +19,7 @@ class Ui(QtWidgets.QMainWindow):
         self.canvas = Canvas(1100, 600)
         self.canvasHorizontalLayout.addWidget(self.canvas)
 
-    def ConnectBtnsFunctions(self):
+    def connect_btns_functions(self):
         #### btn connections ####
         self.newFileBtn.pressed.connect(self.new_file_btn_pressed)
         self.openFileBtn.pressed.connect(self.open_file_btn_pressed)
