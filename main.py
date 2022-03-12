@@ -20,6 +20,8 @@ class Ui(QtWidgets.QMainWindow):
         self.undo_shortcut.activated.connect(self.undo_shortcut_activate)
         self.redo_shortcut = QShortcut(QKeySequence("Ctrl+Y"), self)
         self.redo_shortcut.activated.connect(self.redo_shortcut_activate)
+        self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        self.save_shortcut.activated.connect(self.save_shortcut_activate)
 
     def addition_to_ui(self):
         """this function used for ui objects or edits that cant done on QT creator"""
@@ -171,6 +173,9 @@ class Ui(QtWidgets.QMainWindow):
 
     def redo_shortcut_activate(self):
         self.redo_btn_pressed()
+
+    def save_shortcut_activate(self):
+        self.save_file_btn_pressed()
 
 
 app = QtWidgets.QApplication(sys.argv)
