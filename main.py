@@ -86,6 +86,7 @@ class Ui(QtWidgets.QMainWindow):
     def fill_btn_pressed(self):
         self.canvas.set_mode("fill")
 
+
     def pen_size_combobox_change(self):
         self.canvas.set_pen_size(int(self.penSizeCombobox.currentText()))
 

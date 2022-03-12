@@ -1,6 +1,7 @@
 import enum
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QKeySequence, QPixmap
+from PyQt5.QtCore import QPoint
+from PyQt5.QtGui import QKeySequence, QPixmap, QColor
 from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog, QColorDialog
 
 
@@ -19,7 +20,7 @@ class ShapeMode(enum.Enum):
 
 
 class Canvas(QtWidgets.QLabel):
-    def __init__(self, w, h, back_clr='#ffffff', pen_color='#000000'):
+    def __init__(self, w, h, back_clr='#ffffff', pen_color='#FF0000'):
         super().__init__()
         self.canvas_width = w
         self.canvas_height = h
@@ -84,26 +85,26 @@ class Canvas(QtWidgets.QLabel):
             self.shape_mode = ShapeMode.rounded_rect
 
     def pen_mode_mouse_move_event(self, e):
-        painter = QtGui.QPainter(self.pixmap())
-        p = painter.pen()
-        p.setWidth(self.pen_width)
-        p.setColor(self.pen_color)
-        painter.setPen(p)
-        painter.drawLine(self.last_x, self.last_y, e.x(), e.y())
-        painter.end()
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
+        self.p.setColor(self.pen_color)
+        self.painter.setPen(self.p)
+        self.painter.drawLine(self.last_x, self.last_y, e.x(), e.y())
+        self.painter.end()
         self.update()
         self.last_x = e.x()
         self.last_y = e.y()
 
     def eraser_mode_mouse_move_event(self, e):
-        painter = QtGui.QPainter(self.pixmap())
-        p = painter.pen()
-        p.setWidth(self.pen_width)
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
         eraser_color = QtGui.QColor(self.background_color)
-        p.setColor(eraser_color)
-        painter.setPen(p)
-        painter.drawLine(self.last_x, self.last_y, e.x(), e.y())
-        painter.end()
+        self.p.setColor(eraser_color)
+        self.painter.setPen(self.p)
+        self.painter.drawLine(self.last_x, self.last_y, e.x(), e.y())
+        self.painter.end()
         self.update()
         self.last_x = e.x()
         self.last_y = e.y()
@@ -136,35 +137,35 @@ class Canvas(QtWidgets.QLabel):
 
     def drawing_shape(self):
         self.setPixmap(self.before_drawing_shape_pixmap)
-        painter = QtGui.QPainter(self.pixmap())
-        p = painter.pen()
-        p.setWidth(self.pen_width)
-        p.setColor(self.pen_color)
-        painter.setPen(p)
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
+        self.p.setColor(self.pen_color)
+        self.painter.setPen(self.p)
         if self.shape_mode == ShapeMode.line:
-            painter.drawLine(self.begin_shape_point.x(), self.begin_shape_point.y(), self.end_shape_point.x(), self.end_shape_point.y())
+            self.painter.drawLine(self.begin_shape_point.x(), self.begin_shape_point.y(), self.end_shape_point.x(), self.end_shape_point.y())
         elif self.shape_mode == ShapeMode.circle:
-            painter.drawEllipse(self.begin_shape_point.x(), self.begin_shape_point.y(),
+            self.painter.drawEllipse(self.begin_shape_point.x(), self.begin_shape_point.y(),
                                 self.end_shape_point.x() - self.begin_shape_point.x(),
                                 self.end_shape_point.y() - self.begin_shape_point.y())
         elif self.shape_mode == ShapeMode.rect:
-            painter.drawRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point))
+            self.painter.drawRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point))
         elif self.shape_mode == ShapeMode.rounded_rect:
             if self.begin_shape_point.x() < self.end_shape_point.x() and self.begin_shape_point.y() < self.end_shape_point.y():
-                painter.drawRoundedRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point), 10, 10)
+                self.painter.drawRoundedRect(QtCore.QRect(self.begin_shape_point, self.end_shape_point), 10, 10)
             elif self.begin_shape_point.x() < self.end_shape_point.x() and self.begin_shape_point.y() > self.end_shape_point.y():
                 correct_begin_shape_point = QtCore.QPoint(self.begin_shape_point.x(), self.end_shape_point.y())
                 correct_end_shape_point = QtCore.QPoint(self.end_shape_point.x(), self.begin_shape_point.y())
-                painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
+                self.painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
             elif self.begin_shape_point.x() > self.end_shape_point.x() and self.begin_shape_point.y() > self.end_shape_point.y():
                 correct_begin_shape_point = self.end_shape_point
                 correct_end_shape_point = self.begin_shape_point
-                painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
+                self.painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
             else:
                 correct_begin_shape_point = QtCore.QPoint(self.end_shape_point.x(), self.begin_shape_point.y())
                 correct_end_shape_point = QtCore.QPoint(self.begin_shape_point.x(), self.end_shape_point.y())
-                painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
-
+                self.painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
+        self.painter.end()
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:
             self.pen_mode_mouse_move_event(e)
@@ -178,13 +179,13 @@ class Canvas(QtWidgets.QLabel):
     def pen_mode_mouse_press_event(self, e):
         self.last_x = e.x()
         self.last_y = e.y()
-        painter = QtGui.QPainter(self.pixmap())
-        p = painter.pen()
-        p.setWidth(self.pen_width)
-        p.setColor(self.pen_color)
-        painter.setPen(p)
-        painter.drawPoint(e.x(), e.y())
-        painter.end()
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
+        self.p.setColor(self.pen_color)
+        self.painter.setPen(self.p)
+        self.painter.drawPoint(e.x(), e.y())
+        self.painter.end()
         self.update()
         self.last_x = e.x()
         self.last_y = e.y()
@@ -205,20 +206,48 @@ class Canvas(QtWidgets.QLabel):
     def eraser_mode_mouse_press_event(self, e):
         self.last_x = e.x()
         self.last_y = e.y()
-        painter = QtGui.QPainter(self.pixmap())
-        p = painter.pen()
-        p.setWidth(self.pen_width)
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
         eraser_color = QtGui.QColor(self.background_color)
-        p.setColor(eraser_color)
-        painter.setPen(p)
-        painter.drawPoint(e.x(), e.y())
-        painter.end()
+        self.p.setColor(eraser_color)
+        self.painter.setPen(self.p)
+        self.painter.drawPoint(e.x(), e.y())
+        self.painter.end()
         self.update()
         self.last_x = e.x()
         self.last_y = e.y()
 
+    def get_cardinal_points(self, have_seen, center_pos, initial_color):
+        cx, cy = center_pos
+        for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+            xx, yy = cx + x, cy + y
+            if xx >= 0 and xx < self.canvas_width and yy >= 0 and yy < self.canvas_height and (xx, yy) not in have_seen:
+                self.points_queue.append((xx, yy))
+                self.have_seen.add((xx, yy))
+
+    def bfs(self, initial_color):
+        while self.points_queue:
+            x, y = self.points_queue.pop(0)
+            curr_color = self.pixmap().toImage().pixelColor(x, y).name()
+            if curr_color == initial_color and curr_color != self.pen_color.name():
+                self.painter = QtGui.QPainter(self.pixmap())
+                self.p = self.painter.pen()
+                self.p.setWidth(1)
+                self.p.setColor(self.pen_color)
+                self.painter.setPen(self.p)
+                self.painter.drawPoint(x, y)
+                self.update()
+                self.painter.end()
+                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
+
     def fill_mode_mouse_press_event(self, e):
-        pass
+        image = self.pixmap().toImage()
+        clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
+        self.points_queue = []
+        self.points_queue.append((e.x(), e.y()))
+        self.have_seen = set()
+        self.bfs(clicked_pixel_color)
 
     def mouseReleaseEvent(self, e):
         if self.mode == ToolMode.pen:
