@@ -1,7 +1,7 @@
 import enum
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QKeySequence, QPixmap
-from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog
+from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog, QColorDialog
 
 
 class ToolMode(enum.Enum):

@@ -1,6 +1,6 @@
 import PyQt5
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QShortcut, QAction
+from PyQt5.QtWidgets import QShortcut, QAction, QColorDialog
 
 from canvas import Canvas
 from PyQt5 import QtWidgets, uic, QtGui, QtCore, Qt  # pip install pyqt5
@@ -165,7 +165,9 @@ class Ui(QtWidgets.QMainWindow):
         self.canvas.set_pen_color(color)
 
     def color_picker_btn_pressed(self):
-        pass
+        color = QColorDialog.getColor()
+        self.change_selected_color_icon(color.name())
+        self.canvas.set_pen_color(color.name())
 
     def undo_shortcut_activate(self):
         self.undo_btn_pressed()
