@@ -1,6 +1,6 @@
 import enum
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtGui import QKeySequence, QPixmap
 from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog
 
 
@@ -24,6 +24,7 @@ class Canvas(QtWidgets.QLabel):
         self.canvas_width = w
         self.canvas_height = h
         pixmap = QtGui.QPixmap(self.canvas_width, self.canvas_height)
+
         self.background_color = back_clr
         pixmap.fill(QtGui.QColor(self.background_color))  # background of paint
         self.setPixmap(pixmap)
@@ -47,13 +48,20 @@ class Canvas(QtWidgets.QLabel):
     def set_pen_size(self, size):
         self.pen_width = size
 
-    def save_pixmap(self):
+    def save_pixmap_as_image(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()",  "", "All Files (*);;Text Files (*.txt)")
+        file_name, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()",  "", "Image Files (*.png *.jpg *.bmp)")
         if file_name:
-            if file_name[-4:] != '.png' and file_name[-4:] != '.jpg' and file_name[-5:] != '.jpeg':
+            if file_name[-4:] != '.png' and file_name[-4:] != '.jpg' and file_name[-4:] != '.bmp':
                 file_name += '.png'
             self.pixmap().save(file_name)
+
+    def open_image_as_pixmap(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "", "Image Files (*.png *.jpg *.bmp)")
+        if file_name:
+            new_pixmap = QPixmap(file_name)
+            new_pixmap = new_pixmap.scaled(self.canvas_width, self.canvas_height, QtCore.Qt.KeepAspectRatio)
+            self.setPixmap(new_pixmap)
 
     def set_mode(self, new_mode):
         if new_mode == "pen":
