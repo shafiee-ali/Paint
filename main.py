@@ -67,7 +67,7 @@ class Ui(QtWidgets.QMainWindow):
     def open_file_btn_pressed(self):
         pass
     def save_file_btn_pressed (self):
-        pass
+        self.canvas.save_pixmap()
 
     def undo_btn_pressed(self):
         self.canvas.undo_action()
