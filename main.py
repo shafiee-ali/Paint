@@ -7,6 +7,8 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore, Qt  # pip install pyqt5
 import sys
 from qt_material import apply_stylesheet  # pip install qt_material
 
+from PyQt5.QtWidgets import QMessageBox
+
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
@@ -65,7 +67,20 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def new_file_btn_pressed(self):
-        self.canvas.new_pixmap()
+        msg = QMessageBox()
+        msg.setWindowTitle("new paint")
+        msg.setText("this action will delete all your unsaved files! \n are you sure to create new file?")
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.buttonClicked.connect(self.popup_button)
+        x = msg.exec_()
+
+    def popup_button(self, i):
+        if i.text() == "&Yes":
+            self.canvas.new_pixmap()
+        else :
+            pass
+        #print(i.text())
     def open_file_btn_pressed(self):
         self.canvas.open_image_as_pixmap()
     def save_file_btn_pressed (self):
