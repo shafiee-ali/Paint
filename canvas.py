@@ -49,6 +49,12 @@ class Canvas(QtWidgets.QLabel):
     def set_pen_size(self, size):
         self.pen_width = size
 
+    def new_pixmap(self):
+        self.undo_stack = list()
+        self.redo_stack = list()
+        pixmap = QtGui.QPixmap(self.canvas_width, self.canvas_height)
+        pixmap.fill(QtGui.QColor(self.background_color))  # background of paint
+        self.setPixmap(pixmap)
     def save_pixmap_as_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()",  "", "Image Files (*.png *.jpg *.bmp)")

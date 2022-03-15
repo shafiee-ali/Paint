@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 5.0.2, 2022-02-23T15:59:02. -->
+<!-- Written by QtCreator 5.0.2, 2022-02-23T21:53:33. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -237,13 +237,15 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/ali79/Documents/qtcreator/paintproject/paintproject.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/ali79/Documents/qtcreator/paintproject/paintproject.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">paintproject2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:E:/work/Paint/UI/paintproject.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">E:/work/Paint/UI/paintproject.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/ali79/Documents/qtcreator/build-paintproject-Desktop_x86_windows_msvc2019_pe_64bit-Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

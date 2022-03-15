@@ -65,7 +65,7 @@ class Ui(QtWidgets.QMainWindow):
 
 
     def new_file_btn_pressed(self):
-        pass
+        self.canvas.new_pixmap()
     def open_file_btn_pressed(self):
         self.canvas.open_image_as_pixmap()
     def save_file_btn_pressed (self):
