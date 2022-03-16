@@ -1,9 +1,11 @@
 import enum
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QPixmap, QCursor
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtGui import QPixmap, QCursor, QMovie
+from PyQt5.QtWidgets import QFileDialog, QWidget, QLabel, QSizePolicy
 
+import time
 
 class ToolMode(enum.Enum):
     pen = 1
@@ -18,6 +20,31 @@ class ShapeMode(enum.Enum):
     rect = 3
     rounded_rect = 4
 
+class loadingScreen(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(200,200)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+
+        self.label = QLabel("please wait for fill to complete", self)
+        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setStyleSheet("QLabel {background-color: red;}")
+
+
+        self.label_animation = QLabel(self)
+        self.movie = QMovie("UI/Loading_2.gif")
+        self.label_animation.setMovie(self.movie)
+        self.movie.start()
+
+        # timer = QTimer(self)
+        # timer.singleShot(3000,self.stop_animation)
+
+    def show_loadingScreen(self):
+        self.show()
+
+    def close_loadingScreen(self):
+        self.close()
 
 class Canvas(QtWidgets.QLabel):
     """
@@ -54,6 +81,8 @@ class Canvas(QtWidgets.QLabel):
         self.redo_stack = list()
 
         self.canvas_image = None
+
+        self.loadingScreen = loadingScreen()  ##TODO:check
 
     def set_pen_color(self, color):
         """
@@ -128,12 +157,14 @@ class Canvas(QtWidgets.QLabel):
 
     def mousePressEvent(self, e):
         self.undo_stack.append(self.pixmap().copy())
-        if self.mode == ToolMode.pen:
+        if self.mode == ToolMode.fill:
+            self.loadingScreen.show_loadingScreen()
+
+            self.fill_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.pen:
             self.pen_mode_mouse_press_event(e)
         elif self.mode == ToolMode.eraser:
             self.eraser_mode_mouse_press_event(e)
-        elif self.mode == ToolMode.fill:
-            self.fill_mode_mouse_press_event(e)
         elif self.mode == ToolMode.shape:
             self.shape_mode_mouse_press_event(e)
 
@@ -174,12 +205,13 @@ class Canvas(QtWidgets.QLabel):
         self.update()
 
     def mouseMoveEvent(self, e):
-        if self.mode == ToolMode.pen:
+        if self.mode == ToolMode.fill:
+            pass
+            # self.fill_mode_mouse_move_event(e)
+        elif self.mode == ToolMode.pen:
             self.pen_mode_mouse_move_event(e)
         elif self.mode == ToolMode.eraser:
             self.eraser_mode_mouse_move_event(e)
-        elif self.mode == ToolMode.fill:
-            self.fill_mode_mouse_move_event(e)
         elif self.mode == ToolMode.shape:
             self.shape_mode_mouse_move_event(e)
 
@@ -267,24 +299,26 @@ class Canvas(QtWidgets.QLabel):
             self.setPixmap(last_pixmap)
 
     def fill_mode_mouse_press_event(self, e):
+        start_time = time.time()
         # image = self.pixmap().toImage()
         self.canvas_image = self.pixmap().toImage()
         # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
-        clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y()).name()
+        clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y())#.name()
         self.points_queue = []
         self.points_queue.append((e.x(), e.y()))
         self.have_seen = set()
         self.bfs(clicked_pixel_color)
         self.setPixmap(QPixmap.fromImage(self.canvas_image))
         self.update()
-
+        print(time.time() - start_time)
+        self.loadingScreen.close_loadingScreen()
 
     def bfs(self, initial_color):
         while self.points_queue:
             x, y = self.points_queue.pop(0)
             # curr_color = self.pixmap().toImage().pixelColor(x, y).name()
-            curr_color = self.canvas_image.pixelColor(x, y).name()
-            if curr_color == initial_color and curr_color != self.pen_color.name():
+            curr_color = self.canvas_image.pixelColor(x, y)#.name()
+            if curr_color == initial_color and curr_color != self.pen_color: #.name():
 
                 self.canvas_image.setPixelColor(x, y, self.pen_color)
 

@@ -2,7 +2,7 @@ from functools import partial
 
 from PyQt5.QtGui import QKeySequence, QCursor
 from PyQt5.QtWidgets import QShortcut, QColorDialog, QPushButton, QMessageBox
-from canvas import Canvas, ToolMode, ShapeMode
+from canvas import Canvas, ToolMode, ShapeMode,loadingScreen
 from PyQt5 import QtWidgets, uic, QtCore  # pip install pyqt5
 import sys
 from qt_material import apply_stylesheet  # pip install qt_material
@@ -19,6 +19,7 @@ class Ui(QtWidgets.QMainWindow):
         self.addition_to_ui()  # complete UI
         self.connect_btns_functions()  # set UI buttons functions
         self.show()
+
         # --- Begin adding some shortcuts --- #
         self.undo_shortcut = QShortcut(QKeySequence("Ctrl+Z"), self)
         self.undo_shortcut.activated.connect(self.undo_shortcut_activate)
