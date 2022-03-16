@@ -53,8 +53,6 @@ class Canvas(QtWidgets.QLabel):
         self.undo_stack = list()
         self.redo_stack = list()
 
-
-
     def set_pen_color(self, color):
         """
         set pen color
@@ -125,7 +123,74 @@ class Canvas(QtWidgets.QLabel):
             self.shape_mode = ShapeMode.rect
         if new_shape_mode == ShapeMode.rounded_rect.name:
             self.shape_mode = ShapeMode.rounded_rect
-#### 2
+
+    def mousePressEvent(self, e):
+        self.undo_stack.append(self.pixmap().copy())
+        if self.mode == ToolMode.pen:
+            self.pen_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.eraser:
+            self.eraser_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.fill:
+            self.fill_mode_mouse_press_event(e)
+        elif self.mode == ToolMode.shape:
+            self.shape_mode_mouse_press_event(e)
+
+    def pen_mode_mouse_press_event(self, e):
+        self.last_x = e.x()
+        self.last_y = e.y()
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
+        self.p.setColor(self.pen_color)
+        self.painter.setPen(self.p)
+        self.painter.drawPoint(e.x(), e.y())
+        self.painter.end()
+        self.update()
+        self.last_x = e.x()
+        self.last_y = e.y()
+
+    def eraser_mode_mouse_press_event(self, e):
+        self.last_x = e.x()
+        self.last_y = e.y()
+        self.painter = QtGui.QPainter(self.pixmap())
+        self.p = self.painter.pen()
+        self.p.setWidth(self.pen_width)
+        eraser_color = QtGui.QColor(self.background_color)
+        self.p.setColor(eraser_color)
+        self.painter.setPen(self.p)
+        self.painter.drawPoint(e.x(), e.y())
+        self.painter.end()
+        self.update()
+        self.last_x = e.x()
+        self.last_y = e.y()
+
+    def fill_mode_mouse_press_event(self, e):
+
+        image = self.pixmap().toImage()
+        clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
+        self.points_queue = []
+        self.points_queue.append((e.x(), e.y()))
+        self.have_seen = set()
+        self.bfs(clicked_pixel_color)
+
+    def shape_mode_mouse_press_event(self, e):
+        self.before_drawing_shape_pixmap = self.pixmap().copy()
+        self.begin_shape_point = e.pos()
+        self.end_shape_point = e.pos()
+        self.drawing_shape()
+        self.update()
+
+
+    def mouseMoveEvent(self, e):
+        if self.mode == ToolMode.pen:
+            self.pen_mode_mouse_move_event(e)
+        elif self.mode == ToolMode.eraser:
+            self.eraser_mode_mouse_move_event(e)
+        elif self.mode == ToolMode.fill:
+            self.fill_mode_mouse_move_event(e)
+        elif self.mode == ToolMode.shape:
+            self.shape_mode_mouse_move_event(e)
+
     def pen_mode_mouse_move_event(self, e):
         """
 
@@ -163,24 +228,6 @@ class Canvas(QtWidgets.QLabel):
 
     def fill_mode_mouse_move_event(self, e):
         pass
- ########### 1
-    def mousePressEvent(self, e):
-        self.undo_stack.append(self.pixmap().copy())
-        if self.mode == ToolMode.pen:
-            self.pen_mode_mouse_press_event(e)
-        elif self.mode == ToolMode.eraser:
-            self.eraser_mode_mouse_press_event(e)
-        elif self.mode == ToolMode.fill:
-            self.fill_mode_mouse_press_event(e)
-        elif self.mode == ToolMode.shape:
-            self.shape_mode_mouse_press_event(e)
-
-    def shape_mode_mouse_press_event(self, e):
-        self.before_drawing_shape_pixmap = self.pixmap().copy()
-        self.begin_shape_point = e.pos()
-        self.end_shape_point = e.pos()
-        self.drawing_shape()
-        self.update()
 
     def drawing_shape(self):
         self.setPixmap(self.before_drawing_shape_pixmap)
@@ -213,29 +260,8 @@ class Canvas(QtWidgets.QLabel):
                 correct_end_shape_point = QtCore.QPoint(self.begin_shape_point.x(), self.end_shape_point.y())
                 self.painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
         self.painter.end()
-    def mouseMoveEvent(self, e):
-        if self.mode == ToolMode.pen:
-            self.pen_mode_mouse_move_event(e)
-        elif self.mode == ToolMode.eraser:
-            self.eraser_mode_mouse_move_event(e)
-        elif self.mode == ToolMode.fill:
-            self.fill_mode_mouse_move_event(e)
-        elif self.mode == ToolMode.shape:
-            self.shape_mode_mouse_move_event(e)
 
-    def pen_mode_mouse_press_event(self, e):
-        self.last_x = e.x()
-        self.last_y = e.y()
-        self.painter = QtGui.QPainter(self.pixmap())
-        self.p = self.painter.pen()
-        self.p.setWidth(self.pen_width)
-        self.p.setColor(self.pen_color)
-        self.painter.setPen(self.p)
-        self.painter.drawPoint(e.x(), e.y())
-        self.painter.end()
-        self.update()
-        self.last_x = e.x()
-        self.last_y = e.y()
+
 
     def undo_action(self):
         if self.undo_stack:
@@ -249,21 +275,6 @@ class Canvas(QtWidgets.QLabel):
             last_pixmap = self.redo_stack.pop()
             self.undo_stack.append(self.pixmap().copy())
             self.setPixmap(last_pixmap)
-
-    def eraser_mode_mouse_press_event(self, e):
-        self.last_x = e.x()
-        self.last_y = e.y()
-        self.painter = QtGui.QPainter(self.pixmap())
-        self.p = self.painter.pen()
-        self.p.setWidth(self.pen_width)
-        eraser_color = QtGui.QColor(self.background_color)
-        self.p.setColor(eraser_color)
-        self.painter.setPen(self.p)
-        self.painter.drawPoint(e.x(), e.y())
-        self.painter.end()
-        self.update()
-        self.last_x = e.x()
-        self.last_y = e.y()
 
     def get_cardinal_points(self, have_seen, center_pos, initial_color):
         cx, cy = center_pos
@@ -288,18 +299,12 @@ class Canvas(QtWidgets.QLabel):
                 self.painter.end()
                 self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
 
-    def fill_mode_mouse_press_event(self, e):
-
-        image = self.pixmap().toImage()
-        clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
-        self.points_queue = []
-        self.points_queue.append((e.x(), e.y()))
-        self.have_seen = set()
-        self.bfs(clicked_pixel_color)
-
 
     def mouseReleaseEvent(self, e):
         # if self.mode == ToolMode.pen: #TODO:WHY???
         #     self.last_x = None
         #     self.last_y = None
+        self.before_drawing_shape_pixmap = None
+        self.begin_shape_point = None
+        self.end_shape_point = None
         self.redo_stack = list()
