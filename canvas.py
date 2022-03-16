@@ -53,6 +53,8 @@ class Canvas(QtWidgets.QLabel):
         self.undo_stack = list()
         self.redo_stack = list()
 
+        self.canvas_image = None
+
     def set_pen_color(self, color):
         """
         set pen color
@@ -164,22 +166,12 @@ class Canvas(QtWidgets.QLabel):
         self.last_x = e.x()
         self.last_y = e.y()
 
-    def fill_mode_mouse_press_event(self, e):
-
-        image = self.pixmap().toImage()
-        clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
-        self.points_queue = []
-        self.points_queue.append((e.x(), e.y()))
-        self.have_seen = set()
-        self.bfs(clicked_pixel_color)
-
     def shape_mode_mouse_press_event(self, e):
         self.before_drawing_shape_pixmap = self.pixmap().copy()
         self.begin_shape_point = e.pos()
         self.end_shape_point = e.pos()
         self.drawing_shape()
         self.update()
-
 
     def mouseMoveEvent(self, e):
         if self.mode == ToolMode.pen:
@@ -261,8 +253,6 @@ class Canvas(QtWidgets.QLabel):
                 self.painter.drawRoundedRect(QtCore.QRect(correct_begin_shape_point, correct_end_shape_point), 10, 10)
         self.painter.end()
 
-
-
     def undo_action(self):
         if self.undo_stack:
             last_pixmap = self.undo_stack.pop()
@@ -276,6 +266,38 @@ class Canvas(QtWidgets.QLabel):
             self.undo_stack.append(self.pixmap().copy())
             self.setPixmap(last_pixmap)
 
+    def fill_mode_mouse_press_event(self, e):
+        # image = self.pixmap().toImage()
+        self.canvas_image = self.pixmap().toImage()
+        # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
+        clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y()).name()
+        self.points_queue = []
+        self.points_queue.append((e.x(), e.y()))
+        self.have_seen = set()
+        self.bfs(clicked_pixel_color)
+        self.setPixmap(QPixmap.fromImage(self.canvas_image))
+        self.update()
+
+
+    def bfs(self, initial_color):
+        while self.points_queue:
+            x, y = self.points_queue.pop(0)
+            # curr_color = self.pixmap().toImage().pixelColor(x, y).name()
+            curr_color = self.canvas_image.pixelColor(x, y).name()
+            if curr_color == initial_color and curr_color != self.pen_color.name():
+
+                self.canvas_image.setPixelColor(x, y, self.pen_color)
+
+                # self.painter = QtGui.QPainter(self.canvas_image)
+                # self.p = self.painter.pen()
+                # self.p.setWidth(1)
+                # self.p.setColor(self.pen_color)
+                # self.painter.setPen(self.p)
+                # self.painter.drawPoint(x, y)
+                # # self.update()
+                # self.painter.end()
+                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
+
     def get_cardinal_points(self, have_seen, center_pos, initial_color):
         cx, cy = center_pos
         for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
@@ -283,22 +305,6 @@ class Canvas(QtWidgets.QLabel):
             if xx >= 0 and xx < self.canvas_width and yy >= 0 and yy < self.canvas_height and (xx, yy) not in have_seen:
                 self.points_queue.append((xx, yy))
                 self.have_seen.add((xx, yy))
-
-    def bfs(self, initial_color):
-        while self.points_queue:
-            x, y = self.points_queue.pop(0)
-            curr_color = self.pixmap().toImage().pixelColor(x, y).name()
-            if curr_color == initial_color and curr_color != self.pen_color.name():
-                self.painter = QtGui.QPainter(self.pixmap())
-                self.p = self.painter.pen()
-                self.p.setWidth(1)
-                self.p.setColor(self.pen_color)
-                self.painter.setPen(self.p)
-                self.painter.drawPoint(x, y)
-                self.update()
-                self.painter.end()
-                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
-
 
     def mouseReleaseEvent(self, e):
         # if self.mode == ToolMode.pen: #TODO:WHY???
