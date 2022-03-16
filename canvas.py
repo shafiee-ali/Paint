@@ -1,8 +1,12 @@
 import enum
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QKeySequence, QPixmap, QColor
-from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog, QDialog, QVBoxLayout, \
+    QLabel
+
+import threading
 
 
 class ToolMode(enum.Enum):
@@ -20,7 +24,7 @@ class ShapeMode(enum.Enum):
 
 
 class Canvas(QtWidgets.QLabel):
-    def __init__(self, w, h, back_clr='#ffffff', pen_color='#FF0000'):
+    def __init__(self, w, h, back_clr='#ffffff', pen_color='#000000',pensize=1):
         super().__init__()
         self.canvas_width = w
         self.canvas_height = h
@@ -31,7 +35,7 @@ class Canvas(QtWidgets.QLabel):
         self.setPixmap(pixmap)
         self.last_x, self.last_y = None, None
         self.pen_color = QtGui.QColor(pen_color)
-        self.pen_width = 2
+        self.pen_width = pensize
         self.mode = ToolMode.pen
         self.shape_mode = None
         self.begin_shape_point = None
@@ -71,23 +75,23 @@ class Canvas(QtWidgets.QLabel):
             self.setPixmap(new_pixmap)
 
     def set_mode(self, new_mode):
-        if new_mode == "pen":
+        if new_mode == ToolMode.pen.name:
             self.mode = ToolMode.pen
-        if new_mode == "eraser":
+        if new_mode == ToolMode.eraser.name:
             self.mode = ToolMode.eraser
-        if new_mode == "fill":
+        if new_mode == ToolMode.fill.name:
             self.mode = ToolMode.fill
-        if new_mode == "shape":
+        if new_mode == ToolMode.shape.name:
             self.mode = ToolMode.shape
 
     def set_shape_mode(self, new_shape_mode):
-        if new_shape_mode == "line":
+        if new_shape_mode == ShapeMode.line.name:
             self.shape_mode = ShapeMode.line
-        if new_shape_mode == "circle":
+        if new_shape_mode == ShapeMode.circle.name:
             self.shape_mode = ShapeMode.circle
-        if new_shape_mode == "rect":
+        if new_shape_mode == ShapeMode.rect.name:
             self.shape_mode = ShapeMode.rect
-        if new_shape_mode == "rounded rect":
+        if new_shape_mode == ShapeMode.rounded_rect.name:
             self.shape_mode = ShapeMode.rounded_rect
 
     def pen_mode_mouse_move_event(self, e):
@@ -248,12 +252,14 @@ class Canvas(QtWidgets.QLabel):
                 self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
 
     def fill_mode_mouse_press_event(self, e):
+
         image = self.pixmap().toImage()
         clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
         self.points_queue = []
         self.points_queue.append((e.x(), e.y()))
         self.have_seen = set()
         self.bfs(clicked_pixel_color)
+
 
     def mouseReleaseEvent(self, e):
         if self.mode == ToolMode.pen:

@@ -1,8 +1,8 @@
 import PyQt5
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QShortcut, QAction, QColorDialog
+from PyQt5.QtWidgets import QShortcut, QAction, QColorDialog, QGroupBox, QPushButton
 
-from canvas import Canvas
+from canvas import Canvas,ToolMode ,ShapeMode
 from PyQt5 import QtWidgets, uic, QtGui, QtCore, Qt  # pip install pyqt5
 import sys
 from qt_material import apply_stylesheet  # pip install qt_material
@@ -30,7 +30,8 @@ class Ui(QtWidgets.QMainWindow):
         self.penSizeCombobox.setStyleSheet("font-size: 20px;")
         self.canvas = Canvas(1100, 600)
         self.canvasHorizontalLayout.addWidget(self.canvas)
-
+        self.show_selected_btn_in_ui()
+        self.change_selected_color_icon('#000000')
     def connect_btns_functions(self):
         #### btn connections ####
         self.newFileBtn.pressed.connect(self.new_file_btn_pressed)
@@ -72,15 +73,16 @@ class Ui(QtWidgets.QMainWindow):
         msg.setText("this action will delete all your unsaved files! \n are you sure to create new file?")
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msg.buttonClicked.connect(self.popup_button)
+        msg.buttonClicked.connect(self.new_file_btn_popup)
         x = msg.exec_()
 
-    def popup_button(self, i):
+
+    def new_file_btn_popup(self, i):
         if i.text() == "&Yes":
             self.canvas.new_pixmap()
         else :
             pass
-        #print(i.text())
+
     def open_file_btn_pressed(self):
         self.canvas.open_image_as_pixmap()
     def save_file_btn_pressed (self):
@@ -93,33 +95,72 @@ class Ui(QtWidgets.QMainWindow):
         self.canvas.redo_action()
 
     def pen_btn_pressed(self):
-        self.canvas.set_mode("pen")
+        self.canvas.set_mode(ToolMode.pen.name)
+        self.show_selected_btn_in_ui()
+
 
     def eraser_btn_pressed(self):
-        self.canvas.set_mode("eraser")
+        self.canvas.set_mode(ToolMode.eraser.name)
+        self.show_selected_btn_in_ui()
 
     def fill_btn_pressed(self):
-        self.canvas.set_mode("fill")
+        self.canvas.set_mode(ToolMode.fill.name)
+        self.show_selected_btn_in_ui()
 
+    def fill_btn_popup(self, i):
+        if i.text() == "&Yes":
+            self.canvas.new_pixmap()
+        else :
+            pass
 
     def pen_size_combobox_change(self):
         self.canvas.set_pen_size(int(self.penSizeCombobox.currentText()))
 
     def line_shape_btn_pressed(self):
-        self.canvas.set_mode("shape")
-        self.canvas.set_shape_mode("line")
+        self.canvas.set_mode(ToolMode.shape.name)
+        self.canvas.set_shape_mode(ShapeMode.line.name)
+        self.show_selected_btn_in_ui()
 
     def rounded_rect_shape_btn_pressed(self):
-        self.canvas.set_mode("shape")
-        self.canvas.set_shape_mode("rounded rect")
+        self.canvas.set_mode(ToolMode.shape.name)
+        self.canvas.set_shape_mode(ShapeMode.rounded_rect.name)
+        self.show_selected_btn_in_ui()
 
     def rect_shape_btn_pressed(self):
-        self.canvas.set_mode("shape")
-        self.canvas.set_shape_mode("rect")
+        self.canvas.set_mode(ToolMode.shape.name)
+        self.canvas.set_shape_mode(ShapeMode.rect.name)
+        self.show_selected_btn_in_ui()
 
     def circle_shape_btn_pressed(self):
-        self.canvas.set_mode("shape")
-        self.canvas.set_shape_mode("circle")
+        self.canvas.set_mode(ToolMode.shape.name)
+        self.canvas.set_shape_mode(ShapeMode.circle.name)
+        self.show_selected_btn_in_ui()
+
+    def show_selected_btn_in_ui(self):
+        for btn in self.toolBox.findChildren(QPushButton):
+            btn.setEnabled(True)
+        for btn in  self.shapesBox.findChildren(QPushButton):
+            btn.setEnabled(True)
+        if self.canvas.mode == ToolMode.pen:
+            self.penBtn.setEnabled(False)
+        elif self.canvas.mode == ToolMode.eraser:
+            self.eraserBtn.setEnabled(False)
+        elif self.canvas.mode == ToolMode.fill:
+            self.fillBtn.setEnabled(False)
+        elif self.canvas.mode == ToolMode.shape:
+            if self.canvas.shape_mode == ShapeMode.line:
+                self.lineShapeBtn.setEnabled(False)
+            elif self.canvas.shape_mode == ShapeMode.rect:
+                self.squareShapeBtn.setEnabled(False)
+            elif self.canvas.shape_mode == ShapeMode.rounded_rect:
+                self.roundedSquareShapeBtn.setEnabled(False)
+            elif self.canvas.shape_mode == ShapeMode.circle:
+                self.circleShapeBtn.setEnabled(False)
+            else:
+                pass
+        else:
+            pass
+
 
     def change_selected_color_icon(self, color):
         self.selectedColorIcon.setStyleSheet("background-color:" + color + "; border-radius : 20;")
