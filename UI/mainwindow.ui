@@ -266,7 +266,7 @@
        <item>
         <widget class="QGroupBox" name="penSizeBox">
          <property name="title">
-          <string>Pen size</string>
+          <string>size     </string>
          </property>
          <widget class="QComboBox" name="penSizeCombobox">
           <property name="geometry">
