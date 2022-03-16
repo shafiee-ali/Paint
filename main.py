@@ -33,7 +33,6 @@ class Ui(QtWidgets.QMainWindow):
         self.penSizeCombobox.setStyleSheet("font-size: 20px;")
         self.canvas = Canvas(1100, 600)  # initiate canvas
         self.canvasHorizontalLayout.addWidget(self.canvas)
-        self.canvas.setCursor(QCursor(QtCore.Qt.CrossCursor))
         self.show_selected_btn_in_ui()
         self.change_selected_color_icon('#000000')
 
@@ -85,7 +84,15 @@ class Ui(QtWidgets.QMainWindow):
     def new_file_btn_popup(self, i):
         """ choose what \"newFileBtn\"s popup btns do!"""
         if i.text() == "&Yes":
-            self.canvas.new_pixmap()
+            w = self.canvas.canvas_width
+            h = self.canvas.canvas_height
+            back_clr = self.canvas.background_color
+            pen_color = self.canvas.pen_color.name()
+            pensize = self.canvas.pen_width
+            self.canvasHorizontalLayout.removeWidget(self.canvas)
+            self.canvas = Canvas(w, h, back_clr=back_clr, pen_color=pen_color, pensize=pensize)
+            self.canvasHorizontalLayout.addWidget(self.canvas)
+            self.show_selected_btn_in_ui()
         else:
             pass
 

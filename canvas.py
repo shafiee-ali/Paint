@@ -1,12 +1,8 @@
 import enum
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import QPoint
-from PyQt5.QtGui import QKeySequence, QPixmap, QColor
-from PyQt5.QtWidgets import QShortcut, QAction, QMenu, QFileDialog, QDialog, QVBoxLayout, \
-    QLabel
-
-import threading
+from PyQt5.QtGui import QPixmap, QCursor
+from PyQt5.QtWidgets import QFileDialog
 
 
 class ToolMode(enum.Enum):
@@ -24,8 +20,20 @@ class ShapeMode(enum.Enum):
 
 
 class Canvas(QtWidgets.QLabel):
+    """
+    this is a special widget that has drawing functions
+    """
     def __init__(self, w, h, back_clr='#ffffff', pen_color='#000000',pensize=1):
+        """
+
+        :param w: width of canvas
+        :param h: height of canvas
+        :param back_clr: background color of canvas
+        :param pen_color: pen color of canvas
+        :param pensize: pen size of canvas
+        """
         super().__init__()
+        self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         self.canvas_width = w
         self.canvas_height = h
         pixmap = QtGui.QPixmap(self.canvas_width, self.canvas_height)
@@ -48,18 +56,28 @@ class Canvas(QtWidgets.QLabel):
 
 
     def set_pen_color(self, color):
+        """
+        set pen color
+
+        :param color: (string) hex color (like:"#FFFFFF")
+        :return: nothing
+        """
         self.pen_color = QtGui.QColor(color)
 
     def set_pen_size(self, size):
+        """
+        set pen size
+
+        :param size: width of pen
+        :return: nothing
+        """
         self.pen_width = size
 
-    def new_pixmap(self):
-        self.undo_stack = list()
-        self.redo_stack = list()
-        pixmap = QtGui.QPixmap(self.canvas_width, self.canvas_height)
-        pixmap.fill(QtGui.QColor(self.background_color))  # background of paint
-        self.setPixmap(pixmap)
     def save_pixmap_as_image(self):
+        """
+        this function will save canvas as image
+        :return: noting
+        """
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()",  "", "Image Files (*.png *.jpg *.bmp)")
         if file_name:
@@ -68,6 +86,10 @@ class Canvas(QtWidgets.QLabel):
             self.pixmap().save(file_name)
 
     def open_image_as_pixmap(self):
+        """
+        this function will open an image in canvas
+        :return: noting
+        """
         file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "", "Image Files (*.png *.jpg *.bmp)")
         if file_name:
             new_pixmap = QPixmap(file_name)
@@ -75,6 +97,11 @@ class Canvas(QtWidgets.QLabel):
             self.setPixmap(new_pixmap)
 
     def set_mode(self, new_mode):
+        """
+        set mode of tool (which tool we are using ex: pen, eraser & etc)
+        :param new_mode: (type:ToolMode)name of the tool we want to use
+        :return: noting
+        """
         if new_mode == ToolMode.pen.name:
             self.mode = ToolMode.pen
         if new_mode == ToolMode.eraser.name:
@@ -85,6 +112,11 @@ class Canvas(QtWidgets.QLabel):
             self.mode = ToolMode.shape
 
     def set_shape_mode(self, new_shape_mode):
+        """
+        if we select shape tool this function will select what shape we want to draw
+        :param new_shape_mode: (type:ShapeMode) name of the shape we want to use
+        :return: noting
+        """
         if new_shape_mode == ShapeMode.line.name:
             self.shape_mode = ShapeMode.line
         if new_shape_mode == ShapeMode.circle.name:
@@ -93,8 +125,13 @@ class Canvas(QtWidgets.QLabel):
             self.shape_mode = ShapeMode.rect
         if new_shape_mode == ShapeMode.rounded_rect.name:
             self.shape_mode = ShapeMode.rounded_rect
-
+#### 2
     def pen_mode_mouse_move_event(self, e):
+        """
+
+        :param e: (type:mouseEvent)
+        :return: noting
+        """
         self.painter = QtGui.QPainter(self.pixmap())
         self.p = self.painter.pen()
         self.p.setWidth(self.pen_width)
@@ -126,7 +163,7 @@ class Canvas(QtWidgets.QLabel):
 
     def fill_mode_mouse_move_event(self, e):
         pass
-
+ ########### 1
     def mousePressEvent(self, e):
         self.undo_stack.append(self.pixmap().copy())
         if self.mode == ToolMode.pen:
@@ -262,7 +299,7 @@ class Canvas(QtWidgets.QLabel):
 
 
     def mouseReleaseEvent(self, e):
-        if self.mode == ToolMode.pen:
-            self.last_x = None
-            self.last_y = None
+        # if self.mode == ToolMode.pen: #TODO:WHY???
+        #     self.last_x = None
+        #     self.last_y = None
         self.redo_stack = list()
