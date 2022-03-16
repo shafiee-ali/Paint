@@ -55,16 +55,16 @@ class Ui(QtWidgets.QMainWindow):
         self.squareShapeBtn.pressed.connect(self.rect_shape_btn_pressed)
         self.circleShapeBtn.pressed.connect(self.circle_shape_btn_pressed)
 
-        self.color0Btn.pressed.connect(partial(self.color_btn_pressed,0))
-        self.color1Btn.pressed.connect(partial(self.color_btn_pressed,1))
-        self.color2Btn.pressed.connect(partial(self.color_btn_pressed,2))
-        self.color3Btn.pressed.connect(partial(self.color_btn_pressed,3))
-        self.color4Btn.pressed.connect(partial(self.color_btn_pressed,4))
-        self.color5Btn.pressed.connect(partial(self.color_btn_pressed,5))
-        self.color6Btn.pressed.connect(partial(self.color_btn_pressed,6))
-        self.color7Btn.pressed.connect(partial(self.color_btn_pressed,7))
-        self.color8Btn.pressed.connect(partial(self.color_btn_pressed,8))
-        self.color9Btn.pressed.connect(partial(self.color_btn_pressed,9))
+        self.color0Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color1Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color2Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color3Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color4Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color5Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color6Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color7Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color8Btn.pressed.connect(partial(self.color_btn_pressed))
+        self.color9Btn.pressed.connect(partial(self.color_btn_pressed))
 
         self.colorPickerBtn.pressed.connect(self.color_picker_btn_pressed)
 
@@ -219,39 +219,18 @@ class Ui(QtWidgets.QMainWindow):
             pass
 
     def change_selected_color_icon(self, color):
-        """ this functions changes the background of \"selectedColorIcon\" to show what color is selected
-
-        :param color: (string)hex color (example: "#FFFFFF")
+        """
+            this functions changes the background of \"selectedColorIcon\" to show what color is selected
+            :param color: (string)hex color (example: "#FFFFFF")
         """
         self.selectedColorIcon.setStyleSheet("background-color:" + color + "; border-radius : 20;")
 
-    def color_btn_pressed(self,value):
-        """ set color of selected color_btn to selected color
-
-            :param value: (integer)number of selected color btn
+    @QtCore.pyqtSlot()
+    def color_btn_pressed(self):
         """
-        if value == 0:
-            color = self.color0Btn.palette().button().color().name()
-        elif value == 1:
-            color = self.color1Btn.palette().button().color().name()
-        elif value == 2:
-            color = self.color2Btn.palette().button().color().name()
-        elif value == 3:
-            color = self.color3Btn.palette().button().color().name()
-        elif value == 4:
-            color = self.color4Btn.palette().button().color().name()
-        elif value == 5:
-            color = self.color5Btn.palette().button().color().name()
-        elif value == 6:
-            color = self.color6Btn.palette().button().color().name()
-        elif value == 7:
-            color = self.color7Btn.palette().button().color().name()
-        elif value == 8:
-            color = self.color8Btn.palette().button().color().name()
-        elif value == 9:
-            color = self.color9Btn.palette().button().color().name()
-        else:
-            pass
+            set color of selected color_btn to selected color
+        """
+        color = self.sender().palette().button().color().name()
         self.change_selected_color_icon(color)
         self.canvas.set_pen_color(color)
 
