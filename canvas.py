@@ -1,11 +1,12 @@
 import enum
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QCoreApplication
 from PyQt5.QtGui import QPixmap, QCursor, QMovie
 from PyQt5.QtWidgets import QFileDialog, QWidget, QLabel, QSizePolicy
 
-import time
+import time, threading
+
 
 class ToolMode(enum.Enum):
     pen = 1
@@ -26,10 +27,10 @@ class loadingScreen(QWidget):
         self.setFixedSize(200,200)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
 
-        self.label = QLabel("please wait for fill to complete", self)
-        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setStyleSheet("QLabel {background-color: red;}")
+        # self.label = QLabel("please wait for fill to complete", self)
+        # self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.label.setAlignment(QtCore.Qt.AlignCenter)
+        # self.label.setStyleSheet("QLabel {background-color: red;}")
 
 
         self.label_animation = QLabel(self)
@@ -83,6 +84,8 @@ class Canvas(QtWidgets.QLabel):
         self.canvas_image = None
 
         self.loadingScreen = loadingScreen()  ##TODO:check
+
+        self._lock = threading.Lock()
 
     def set_pen_color(self, color):
         """
@@ -159,8 +162,13 @@ class Canvas(QtWidgets.QLabel):
         self.undo_stack.append(self.pixmap().copy())
         if self.mode == ToolMode.fill:
             self.loadingScreen.show_loadingScreen()
+            # x = threading.Thread(target=self.loadingScreen.show_loadingScreen)
+            QCoreApplication.processEvents()
+            x = threading.Thread(target=self.fill_mode_mouse_press_event, args=(e,),daemon=True)
+            # self.fill_mode_mouse_press_event(e)
+            x.start()
 
-            self.fill_mode_mouse_press_event(e)
+
         elif self.mode == ToolMode.pen:
             self.pen_mode_mouse_press_event(e)
         elif self.mode == ToolMode.eraser:
@@ -299,19 +307,22 @@ class Canvas(QtWidgets.QLabel):
             self.setPixmap(last_pixmap)
 
     def fill_mode_mouse_press_event(self, e):
-        start_time = time.time()
-        # image = self.pixmap().toImage()
-        self.canvas_image = self.pixmap().toImage()
-        # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
-        clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y())#.name()
-        self.points_queue = []
-        self.points_queue.append((e.x(), e.y()))
-        self.have_seen = set()
-        self.bfs(clicked_pixel_color)
-        self.setPixmap(QPixmap.fromImage(self.canvas_image))
-        self.update()
-        print(time.time() - start_time)
-        self.loadingScreen.close_loadingScreen()
+        with self._lock:
+            start_time = time.time()
+            # time.sleep(1)
+            # image = self.pixmap().toImage()
+            self.canvas_image = self.pixmap().toImage()
+            # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
+            clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y())  # .name()
+            self.points_queue = []
+            self.points_queue.append((e.x(), e.y()))
+            self.have_seen = set()
+            self.bfs(clicked_pixel_color)
+            self.setPixmap(QPixmap.fromImage(self.canvas_image))
+            # self.update()
+            print(time.time() - start_time)
+            self.loadingScreen.close_loadingScreen()
+            return 
 
     def bfs(self, initial_color):
         while self.points_queue:
