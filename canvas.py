@@ -1,12 +1,17 @@
+import copy
 import enum
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import QTimer, Qt, QCoreApplication
+from PyQt5.QtCore import QTimer, Qt, QCoreApplication, QObject
 from PyQt5.QtGui import QPixmap, QCursor, QMovie
 from PyQt5.QtWidgets import QFileDialog, QWidget, QLabel, QSizePolicy
 
 import time, threading
 
+class Coordinates():
+    def __init__(self, x, y):
+        self.X = x
+        self.Y = y
 
 class ToolMode(enum.Enum):
     pen = 1
@@ -24,7 +29,7 @@ class ShapeMode(enum.Enum):
 class loadingScreen(QWidget):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(200,200)
+        self.setFixedSize(100,100)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
 
         # self.label = QLabel("please wait for fill to complete", self)
@@ -34,7 +39,7 @@ class loadingScreen(QWidget):
 
 
         self.label_animation = QLabel(self)
-        self.movie = QMovie("UI/Loading_2.gif")
+        self.movie = QMovie("UI/load-icon.gif")
         self.label_animation.setMovie(self.movie)
         self.movie.start()
 
@@ -86,6 +91,13 @@ class Canvas(QtWidgets.QLabel):
         self.loadingScreen = loadingScreen()  ##TODO:check
 
         self._lock = threading.Lock()
+        # self.threads = []
+
+        self.is_fill = False  # this bool uses for controlling fill in filling daemon
+        self.fill_Coordinates = Coordinates(0,0)
+        # print(self.fill_Coordinates['x'])
+        self.fill_daemon_thread = threading.Thread(target=self.fill_deamon,daemon=True,name="fill_daemon_thread")
+        self.fill_daemon_thread.start()
 
     def set_pen_color(self, color):
         """
@@ -158,15 +170,49 @@ class Canvas(QtWidgets.QLabel):
         if new_shape_mode == ShapeMode.rounded_rect.name:
             self.shape_mode = ShapeMode.rounded_rect
 
+    # ========================================================================
+    # ========================================================================
+    # ========================================================================
+    # ========================================================================
+    def fill_deamon(self):
+        while(True):
+            if self.is_fill == True:
+                self.setEnabled(False)
+                self.fill_Coordinates.X
+                # e = self.mouse_press_event_saver_for_fill
+                # print("2: ",self.fill_Coordinates.X, self.fill_Coordinates.Y)
+                self.fill_mode_mouse_press_event(self.fill_Coordinates.X,self.fill_Coordinates.Y)
+                self.setEnabled(True)
+                self.is_fill = False
+    # def testfunc(self,e):
+    #     self.threads.append(threading.Thread(target=self.fill_mode_mouse_press_event, args=(e,), daemon=True))
+    #     for t in self.threads:
+    #         print(t)
+    #     # self.fill_mode_mouse_press_event(e)
+    #     self.threads[0].start()
+
     def mousePressEvent(self, e):
+
         self.undo_stack.append(self.pixmap().copy())
         if self.mode == ToolMode.fill:
-            self.loadingScreen.show_loadingScreen()
+            self.loadingScreen.show_loadingScreen() ##TODO
             # x = threading.Thread(target=self.loadingScreen.show_loadingScreen)
-            QCoreApplication.processEvents()
-            x = threading.Thread(target=self.fill_mode_mouse_press_event, args=(e,),daemon=True)
-            # self.fill_mode_mouse_press_event(e)
-            x.start()
+            # QCoreApplication.processEvents() #TODO
+            # x= threading.Thread(target=self.fill_mode_mouse_press_event, args=(e,), daemon=True)
+            # print("1: ",e.x(), e.y())
+            self.fill_Coordinates.X = e.x()
+            self.fill_Coordinates.Y = e.y()
+            self.is_fill = True
+            # self.update()
+
+
+            # self.self.fill_mode_mouse_press_event(e)
+            # self.testfunc(e)
+            # self.threads.append(threading.Thread(target=self.fill_mode_mouse_press_event, args=(e,),daemon=True))
+            # for t in self.threads:
+            #     print(t)
+            # # self.fill_mode_mouse_press_event(e)
+            # self.threads[0].start()
 
 
         elif self.mode == ToolMode.pen:
@@ -176,6 +222,72 @@ class Canvas(QtWidgets.QLabel):
         elif self.mode == ToolMode.shape:
             self.shape_mode_mouse_press_event(e)
 
+    def fill_mode_mouse_press_event2(self,x,y):
+        start_time = time.time()
+        # print("3: ", x, y)
+        self.canvas_image = self.pixmap().toImage()
+        clicked_pixel_color = self.canvas_image.pixelColor(x, y)  # .name()
+        self.points_queue = []
+        self.points_queue.append((x, y))
+        self.have_seen = set()
+        self.bfs(clicked_pixel_color)
+        self.setPixmap(QPixmap.fromImage(self.canvas_image))
+        # self.update()
+        print(time.time() - start_time)
+        self.loadingScreen.close_loadingScreen()
+    def fill_mode_mouse_press_event(self, x, y):
+        with self._lock:
+            start_time = time.time()
+            time.sleep(0.05)
+            # image = self.pixmap().toImage()
+            self.canvas_image = self.pixmap().toImage()
+            # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
+            # print("3: ",x, y)
+            clicked_pixel_color = self.canvas_image.pixelColor(x, y)  # .name()
+            self.points_queue = []
+            self.points_queue.append((x, y))
+            self.have_seen = set()
+            self.bfs(clicked_pixel_color)
+            self.setPixmap(QPixmap.fromImage(self.canvas_image))
+            # self.update()
+            print(time.time() - start_time)
+            self.loadingScreen.close_loadingScreen() ##TODO
+            # x = self.threads.pop(0)
+            # x.terminate()
+            # return
+
+    def bfs(self, initial_color):
+        pen_color = self.pen_color
+        while self.points_queue:
+            x, y = self.points_queue.pop(0)
+            # curr_color = self.pixmap().toImage().pixelColor(x, y).name()
+            curr_color = self.canvas_image.pixelColor(x, y)#.name()
+            if curr_color == initial_color and curr_color != pen_color: #.name():
+
+                self.canvas_image.setPixelColor(x, y, pen_color)
+
+                # self.painter = QtGui.QPainter(self.canvas_image)
+                # self.p = self.painter.pen()
+                # self.p.setWidth(1)
+                # self.p.setColor(self.pen_color)
+                # self.painter.setPen(self.p)
+                # self.painter.drawPoint(x, y)
+                # # self.update()
+                # self.painter.end()
+                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
+
+    def get_cardinal_points(self, have_seen, center_pos, initial_color):
+        cx, cy = center_pos
+        for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+            xx, yy = cx + x, cy + y
+            if xx >= 0 and xx < self.canvas_width and yy >= 0 and yy < self.canvas_height and (xx, yy) not in have_seen:
+                self.points_queue.append((xx, yy))
+                self.have_seen.add((xx, yy))
+
+    #========================================================================
+    # ========================================================================
+    # ========================================================================
+    # ========================================================================
     def pen_mode_mouse_press_event(self, e):
         self.last_x = e.x()
         self.last_y = e.y()
@@ -306,50 +418,7 @@ class Canvas(QtWidgets.QLabel):
             self.undo_stack.append(self.pixmap().copy())
             self.setPixmap(last_pixmap)
 
-    def fill_mode_mouse_press_event(self, e):
-        with self._lock:
-            start_time = time.time()
-            # time.sleep(1)
-            # image = self.pixmap().toImage()
-            self.canvas_image = self.pixmap().toImage()
-            # clicked_pixel_color = image.pixelColor(e.x(), e.y()).name()
-            clicked_pixel_color = self.canvas_image.pixelColor(e.x(), e.y())  # .name()
-            self.points_queue = []
-            self.points_queue.append((e.x(), e.y()))
-            self.have_seen = set()
-            self.bfs(clicked_pixel_color)
-            self.setPixmap(QPixmap.fromImage(self.canvas_image))
-            # self.update()
-            print(time.time() - start_time)
-            self.loadingScreen.close_loadingScreen()
-            return 
 
-    def bfs(self, initial_color):
-        while self.points_queue:
-            x, y = self.points_queue.pop(0)
-            # curr_color = self.pixmap().toImage().pixelColor(x, y).name()
-            curr_color = self.canvas_image.pixelColor(x, y)#.name()
-            if curr_color == initial_color and curr_color != self.pen_color: #.name():
-
-                self.canvas_image.setPixelColor(x, y, self.pen_color)
-
-                # self.painter = QtGui.QPainter(self.canvas_image)
-                # self.p = self.painter.pen()
-                # self.p.setWidth(1)
-                # self.p.setColor(self.pen_color)
-                # self.painter.setPen(self.p)
-                # self.painter.drawPoint(x, y)
-                # # self.update()
-                # self.painter.end()
-                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
-
-    def get_cardinal_points(self, have_seen, center_pos, initial_color):
-        cx, cy = center_pos
-        for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
-            xx, yy = cx + x, cy + y
-            if xx >= 0 and xx < self.canvas_width and yy >= 0 and yy < self.canvas_height and (xx, yy) not in have_seen:
-                self.points_queue.append((xx, yy))
-                self.have_seen.add((xx, yy))
 
     def mouseReleaseEvent(self, e):
         # if self.mode == ToolMode.pen: #TODO:WHY???

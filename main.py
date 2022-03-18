@@ -148,6 +148,7 @@ class Ui(QtWidgets.QMainWindow):
         """
         self.canvas.set_mode(ToolMode.fill.name)
         self.show_selected_btn_in_ui()
+        self.update()
 
     def pen_size_combobox_change(self):
         """ jobs need to do when \"penSizeCombobox\" changes
@@ -156,6 +157,8 @@ class Ui(QtWidgets.QMainWindow):
         """
         penSize = int(self.penSizeCombobox.currentText())
         self.canvas.set_pen_size(penSize)
+        self.update()
+
 
     def line_shape_btn_pressed(self):
         """ jobs need to do when \"lineShapeBtn\" pressed
