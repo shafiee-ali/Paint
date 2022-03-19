@@ -1,8 +1,8 @@
 from functools import partial
 
-from PyQt5.QtGui import QKeySequence, QCursor
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QShortcut, QColorDialog, QPushButton, QMessageBox
-from canvas import Canvas, ToolMode, ShapeMode,loadingScreen
+from canvas import Canvas, ToolMode, ShapeMode
 from PyQt5 import QtWidgets, uic, QtCore  # pip install pyqt5
 import sys
 from qt_material import apply_stylesheet  # pip install qt_material
@@ -13,7 +13,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(Ui, self).__init__()
-        uic.loadUi('./UI//mainwindow.ui', self)  # load UI structure
+        uic.loadUi('UI\mainwindow.ui', self)  # load UI structure
         apply_stylesheet(app, theme='dark_blue.xml')  # apply dark blue theme
         self.canvas = None
         self.addition_to_ui()  # complete UI
