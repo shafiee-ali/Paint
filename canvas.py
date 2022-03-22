@@ -114,7 +114,7 @@ class Canvas(QtWidgets.QLabel):
     def save_pixmap_as_image(self):
         """
         this function will save canvas as image
-        :return: noting
+        :return: nothing
         """
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()",  "", "Image Files (*.png *.jpg *.bmp)")
@@ -234,15 +234,14 @@ class Canvas(QtWidgets.QLabel):
             curr_color = self.canvas_image.pixelColor(x, y)
             if curr_color == initial_color and curr_color != pen_color:
                 self.canvas_image.setPixelColor(x, y, pen_color)
-                self.get_cardinal_points(have_seen=self.have_seen, center_pos=(x, y), initial_color=initial_color)
+                self.add_neighbors_to_queue(have_seen=self.have_seen, center_pos=(x, y))
 
-    def get_cardinal_points(self, have_seen, center_pos, initial_color):
+    def add_neighbors_to_queue(self, have_seen, center_pos):
         """
-        #TODO: ali shafie complete this
-        :param have_seen:
-        :param center_pos:
-        :param initial_color:
-        :return:
+        this function adds 4 neighbors of a point
+        :param have_seen: sets of points that add to queue
+        :param center_pos: tuple (x, y) that holds position of a point
+        :return: None
         """
         cx, cy = center_pos
         for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
