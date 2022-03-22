@@ -23,7 +23,7 @@ class Ui(QtWidgets.QMainWindow):
         # --- Begin adding some shortcuts --- #
         self.undo_shortcut = QShortcut(QKeySequence("Ctrl+Z"), self)
         self.undo_shortcut.activated.connect(self.undo_shortcut_activate)
-        self.redo_shortcut = QShortcut(QKeySequence("Ctrl+shift+Z"), self)
+        self.redo_shortcut = QShortcut(QKeySequence("Ctrl+Y"), self)
         self.redo_shortcut.activated.connect(self.redo_shortcut_activate)
         self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
         self.save_shortcut.activated.connect(self.save_shortcut_activate)
